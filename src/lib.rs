@@ -1,4 +1,4 @@
-use kinode_process_lib::http::{send_ws_push, HttpServerRequest, WsMessageType};
+use kinode_process_lib::http::server::{send_ws_push, HttpServerRequest, WsMessageType};
 use kinode_process_lib::vfs::{create_drive, open_file};
 use serde::de::DeserializeOwned;
 use serde::{Serialize, Deserialize};
@@ -595,7 +595,7 @@ where
 
     /// Helper function to deserialize the process state.
     pub fn load(our: &Address) -> Self {
-        let saved_state = match get_typed_state(|bytes| Ok(bincode::deserialize::<ProviderSaveState>(bytes)?)) {
+        let saved_state = match get_typed_state(|bytes| bincode::deserialize::<ProviderSaveState>(bytes)) {
             Some(loaded) => {
                 loaded
             }
@@ -906,19 +906,14 @@ where
                         service.meta.publish_subscribers = options.publish_subscribers;
                         service.meta.publish_subscriber_count = options.publish_subscriber_count;
                         service.meta.publish_whitelist = options.publish_whitelist;
-                        let mut service_state = T::new();
-                        service_state.init(our, &service)?;
+                        
                         state.services.insert(service.id.to_string(), AppServiceStateWrapper {
                             service: service.clone(),
-                            state: service_state,
+                            state: T::new(),
                         });
+
                         let req = ProviderOutput::Service(service);
                         poke(&get_server_address(&our.node), req)?;
-                        let services: Vec<Service> = state.services.values()
-                            .map(|wrapper| wrapper.service.clone())
-                            .collect();
-                        let response_message = FrontendUpdate::Meta(FrontendMetaUpdate::MyServices(services));
-                        update_consumer(channel_id, response_message)?;
                     }
                     FrontendMetaRequest::DeleteService(service_id_string) => {
                         if let Some(mut service) = state.services.remove(&service_id_string) {
@@ -1108,7 +1103,6 @@ pub fn update_consumer (
     websocket_id: u32,
     update: FrontendUpdate,
 ) -> anyhow::Result<()> {
-
     let blob = LazyLoadBlob {
         mime: Some("application/json".to_string()),
         bytes: serde_json::json!(update)
@@ -1183,6 +1177,7 @@ where
             service.meta.publish_subscribers = options.publish_subscribers;
             service.meta.publish_subscriber_count = options.publish_subscriber_count;
             service.meta.publish_whitelist = options.publish_whitelist;
+            
             state.services.insert(service.id.to_string(), AppServiceStateWrapper {
                 service: service.clone(),
                 state: T::new(),
@@ -1670,7 +1665,7 @@ where
     let body = message.body();
     let source = message.source();
     
-    if message.source().node == our.node && message.source().process == "http_server:distro:sys" {
+    if message.source().node == our.node && message.source().process == "http-server:distro:sys" {
         handle_provider_http(our, state, source, body)?;
     } else if let Ok(provider_input) = serde_json::from_slice::<ProviderInput>(&body) {
         handle_provider_input(our, state, source, provider_input)?;
