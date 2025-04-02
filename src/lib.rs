@@ -1,5 +1,5 @@
-use kinode_process_lib::http::server::{send_ws_push, HttpServerRequest, WsMessageType};
-use kinode_process_lib::vfs::{create_drive, open_file};
+use hyperware_process_lib::http::server::{send_ws_push, HttpServerRequest, WsMessageType};
+use hyperware_process_lib::vfs::{create_drive, open_file};
 use serde::de::DeserializeOwned;
 use serde::{Serialize, Deserialize};
 
@@ -8,10 +8,10 @@ use std::str::FromStr;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use std::hash::{Hash, Hasher};
-use kinode_process_lib::{await_message, get_blob, println, Address, LazyLoadBlob, Request, get_typed_state, set_state};
-use kinode_process_lib::timer::set_timer;
+use hyperware_process_lib::{await_message, get_blob, println, Address, LazyLoadBlob, Request, get_typed_state, set_state};
+use hyperware_process_lib::timer::set_timer;
 
-pub const DARTFROG_VERSION: &str = "v0.4.0";
+pub const DARTFROG_VERSION: &str = "v0.5.0";
 
 #[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
 pub struct ServiceID {
