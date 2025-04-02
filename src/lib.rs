@@ -1682,7 +1682,7 @@ where
     Ok(())
 }
 
-pub const PROCESS_NAME : &str = "dartfrog:dartfrog:herobrine.os";
+pub const PROCESS_NAME : &str = "dartfrog:dartfrog:gliderlabs.os";
 
 pub fn get_server_address(node_id: &str) -> Address {
     get_process_address(node_id, PROCESS_NAME)
