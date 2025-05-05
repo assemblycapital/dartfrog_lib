@@ -11,7 +11,7 @@ use std::hash::{Hash, Hasher};
 use hyperware_process_lib::{await_message, get_blob, println, Address, LazyLoadBlob, Request, get_typed_state, set_state};
 use hyperware_process_lib::timer::set_timer;
 
-pub const DARTFROG_VERSION: &str = "v0.5.0";
+pub const DARTFROG_VERSION: &str = "v0.5.1";
 
 #[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
 pub struct ServiceID {
